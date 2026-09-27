@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niche&Nests - Tech, Gaming & Coding Hub</title>
+    <meta name="description" content="Discover, write, and explore high-quality articles on coding, tech innovations, gaming, and digital crafts.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        dark: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-brand-500 selection:text-slate-950">
+
+    <!-- NAVIGATION HEADER -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('feed')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-bold text-xl shadow-lg shadow-brand-500/20">
+                    🪶
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">Niche&Nests</span>
+                    <span class="block text-[10px] font-mono text-slate-400 uppercase tracking-widest -mt-1">Publishing Hub</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                <button onclick="showSection('feed')" class="hover:text-brand-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-compass"></i> Feed</button>
+                <button onclick="showSection('seo-tool')" class="hover:text-brand-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-magnifying-glass-chart"></i> SEO Inspector</button>
+                <button onclick="requireAuth('editor')" class="hover:text-brand-400 transition-colors flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> New Post</button>
+            </nav>
+
+            <!-- User Auth Controls -->
+            <div id="auth-controls" class="flex items-center space-x-3">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO HEADER (FEED ONLY) -->
+    <section id="hero-banner" class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800 py-12 px-4">
+        <div class="max-w-4xl mx-auto text-center space-y-4">
+            <span class="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-400 bg-brand-500/10 border border-brand-500/20 rounded-full inline-block">The Modern Tech Blog Platform</span>
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Share Your Code, Games & Tech Insights</h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">Build your online niche, optimize content for Google indexing, and publish articles effortlessly.</p>
+            <div class="pt-2 flex justify-center gap-4">
+                <button onclick="requireAuth('editor')" class="px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold transition-all shadow-lg shadow-brand-500/25 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Write an Article
+                </button>
+                <button onclick="showSection('seo-tool')" class="px-6 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line"></i> Google SEO Preview
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINERS -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- 1. BLOG FEED SECTION -->
+        <section id="sec-feed" class="space-y-6">
+            <!-- Filter Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div class="relative w-full sm:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" id="feed-search" oninput="renderPosts()" placeholder="Search articles or tags..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm focus:outline-none focus:border-brand-500 text-slate-200">
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+                    <button onclick="filterCategory('all')" class="cat-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-slate-950">All</button>
+                    <button onclick="filterCategory('Coding')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">Coding</button>
+                    <button onclick="filterCategory('Gaming')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">Gaming</button>
+                    <button onclick="filterCategory('Tech')" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">Tech</button>
+                </div>
+            </div>
+
+            <!-- Posts Grid -->
+            <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- 2. ARTICLE READER SECTION -->
+        <section id="sec-reader" class="hidden space-y-6 max-w-3xl mx-auto">
+            <button onclick="showSection('feed')" class="text-sm text-slate-400 hover:text-brand-400 flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-arrow-left"></i> Back to feed
+            </button>
+            <article id="article-view" class="bg-slate-900 rounded-2xl border border-slate-800 p-6 sm:p-10 space-y-6">
+                <!-- Rendered dynamically -->
+            </article>
+        </section>
+
+        <!-- 3. POST EDITOR SECTION -->
+        <section id="sec-editor" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-pen-clip text-brand-400"></i> Create Article</h2>
+                <button onclick="showSection('feed')" class="text-slate-400 hover:text-white text-sm">Cancel</button>
+            </div>
+
+            <form id="editor-form" onsubmit="savePost(event)" class="bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-800 space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Title</label>
+                    <input type="text" id="post-title" required placeholder="e.g., Building a High-Performance Game Engine in Rust" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 font-semibold focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Category</label>
+                        <select id="post-category" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-brand-500">
+                            <option value="Coding">Coding</option>
+                            <option value="Gaming">Gaming</option>
+                            <option value="Tech">Tech</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Tags (Comma separated)</label>
+                        <input type="text" id="post-tags" placeholder="Rust, GameDev, WebAssembly" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Cover Image URL</label>
+                    <input type="url" id="post-image" placeholder="https://images.unsplash.com/photo-..." class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Content (Supports simple HTML/Markdown formatting)</label>
+                    <textarea id="post-content" rows="12" required placeholder="Write your thoughts, code snippets, or guide here..." class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 font-mono text-sm focus:outline-none focus:border-brand-500"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="showSection('feed')" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm">Discard</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-sm shadow-lg shadow-brand-500/20">Publish Article</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 4. SEO & GOOGLE PREVIEW TOOL -->
+        <section id="sec-seo-tool" class="hidden max-w-4xl mx-auto space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-magnifying-glass-chart text-brand-400"></i> Google SEO Inspector & Previewer</h2>
+                <p class="text-slate-400 text-sm">Analyze how your Niche&Nests posts look in Google search results before publishing.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Input Panel -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Article SEO Metadata</h3>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">SEO Meta Title (30 - 60 chars)</label>
+                        <input type="text" id="seo-input-title" oninput="updateSeoPreview()" value="Top 10 Game Development Frameworks for 2026 | Niche&Nests" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Target Slug / URL</label>
+                        <input type="text" id="seo-input-slug" oninput="updateSeoPreview()" value="top-game-dev-frameworks-2026" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Meta Description (120 - 160 chars)</label>
+                        <textarea id="seo-input-desc" oninput="updateSeoPreview()" rows="3" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500">Compare Godot, Unreal Engine 5, and Unity for modern indie game development. Learn performance stats, code ergonomics, and deployment tools.</textarea>
+                    </div>
+                </div>
+
+                <!-- Google Search Result Preview -->
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Google Search Result Preview</h3>
+                        <div class="bg-white p-4 rounded-xl text-slate-900 shadow-md space-y-1">
+                            <div class="flex items-center space-x-2 text-xs text-slate-600 truncate">
+                                <span class="bg-slate-200 text-slate-800 font-bold px-1.5 py-0.5 rounded text-[10px]">Niche&Nests</span>
+                                <span id="seo-preview-url" class="truncate">https://nicheandnests.com › top-game-dev-frameworks-2026</span>
+                            </div>
+                            <div id="seo-preview-title" class="text-lg font-semibold text-blue-800 hover:underline cursor-pointer truncate">
+                                Top 10 Game Development Frameworks for 2026 | Niche&Nests
+                            </div>
+                            <div id="seo-preview-desc" class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                                Compare Godot, Unreal Engine 5, and Unity for modern indie game development. Learn performance stats, code ergonomics, and deployment tools.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEO Score Indicators -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span>Title Length Health:</span>
+                            <span id="seo-title-status" class="text-emerald-400">Optimal (56 chars)</span>
+                        </div>
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span>Description Length:</span>
+                            <span id="seo-desc-status" class="text-emerald-400">Optimal (145 chars)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-6 relative shadow-2xl">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="text-center space-y-1">
+                <h3 class="text-xl font-bold text-white" id="auth-modal-title">Sign In to Niche&Nests</h3>
+                <p class="text-xs text-slate-400">Join our community to write, publish, and engage.</p>
+            </div>
+
+            <!-- Social Logins -->
+            <div class="space-y-3">
+                <button type="button" onclick="handleGoogleSignIn()" class="w-full flex items-center justify-center gap-3 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-xl font-medium text-sm transition-all shadow-md">
+                    <i class="fa-brands fa-google text-red-400"></i> Continue with Google
+                </button>
+            </div>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-800"></div>
+                <span class="flex-shrink mx-4 text-xs text-slate-500 font-mono">OR</span>
+                <div class="flex-grow border-t border-slate-800"></div>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="auth-name-field" class="hidden">
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Display Name</label>
+                    <input type="text" id="auth-name" placeholder="Alex Rivers" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address</label>
+                    <input type="email" required id="auth-email" placeholder="dev@example.com" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
+                    <input type="password" required id="auth-pass" placeholder="••••••••" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 focus:outline-none focus:border-brand-500">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-brand-500/20">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="text-center text-xs text-slate-400">
+                <span id="auth-toggle-text">Don't have an account?</span>
+                <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-brand-400 font-semibold hover:underline ml-1">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 bg-slate-900 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+            <div class="flex items-center space-x-2">
+                <span>🪶 <strong>Niche&Nests</strong> &copy; 2026. Built for creators & developers.</span>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-brand-400">Privacy Policy</a>
+                <a href="#" class="hover:text-brand-400">Terms of Service</a>
+                <a href="#" class="hover:text-brand-400">Google Search Indexing</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FIREBASE AUTH INTEGRATION MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            sendEmailVerification, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Firebase configuration with your credentials
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5HAl42nuQOFUOt0UunyrHYZ_95gbM-ns",
+            authDomain: "niche-nests-web.firebaseapp.com",
+            projectId: "niche-nests-web",
+            storageBucket: "niche-nests-web.firebasestorage.app",
+            messagingSenderId: "629129382089",
+            appId: "1:629129382089:web:ff0a96513d44454200e518",
+            measurementId: "G-7KPNBSGKGC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // Initialize Firebase Authentication
+        export const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Listen for authentication state changes
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                window.currentUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    name: user.displayName || user.email.split('@')[0],
+                    emailVerified: user.emailVerified
+                };
+            } else {
+                // User is signed out
+                window.currentUser = null;
+            }
+            window.updateAuthUI();
+        });
+
+        // Google Sign-In Function
+        window.handleGoogleSignIn = async function() {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                window.closeAuthModal();
+            } catch (error) {
+                alert(`Google Sign-In Error: ${error.message}`);
+            }
+        };
+
+        // Handle Email Form Submit (Sign Up & Sign In)
+        window.handleAuthSubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-pass').value;
+
+            if (window.authIsSignUp) {
+                // Register a new user
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(async (userCredential) => {
+                        const user = userCredential.user;
+                        await sendEmailVerification(user);
+                        alert("Account created! A verification link has been sent to your email.");
+                        window.closeAuthModal();
+                    })
+                    .catch((error) => {
+                        console.error("Error signing up:", error.message);
+                        alert(`Auth Error: ${error.message}`);
+                    });
+            } else {
+                // Sign in an existing user
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        window.closeAuthModal();
+                    })
+                    .catch((error) => {
+                        console.error("Error signing in:", error.message);
+                        alert(`Auth Error: ${error.message}`);
+                    });
+            }
+        };
+
+        // Sign Out
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Sign-out error:", error);
+            }
+        };
+    </script>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- INITIAL MOCK DATA ---
+        let posts = [
+            {
+                id: '1',
+                title: 'Building a Fast Custom Renderer with WebGPU and TypeScript',
+                category: 'Coding',
+                author: 'Elena Rostova',
+                date: 'May 12, 2026',
+                tags: ['WebGPU', 'Graphics', 'TypeScript'],
+                image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+                content: `<p class="mb-4">WebGPU is officially revolutionizing real-time graphics rendering on the browser. In this article, we break down step-by-step how to write a compute pipeline from scratch.</p><h3 class="text-lg font-bold text-white mb-2">Why WebGPU over WebGL?</h3><p class="mb-4">WebGPU provides lower-level control over modern graphics hardware, matching APIs like Vulkan, Metal, and DirectX 12.</p>`
+            },
+            {
+                id: '2',
+                title: 'Why Indie Game Developers are Switching to Godot 4',
+                category: 'Gaming',
+                author: 'Marcus Vance',
+                date: 'May 10, 2026',
+                tags: ['Godot', 'IndieDev', 'GameDesign'],
+                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+                content: `<p class="mb-4">The open-source game engine revolution is here. Godot 4 introduces brand new rendering features, node architectures, and lightweight deployment options that indie developers love.</p>`
+            },
+            {
+                id: '3',
+                title: 'AI Code Assistants in 2026: What Developers Need to Know',
+                category: 'Tech',
+                author: 'Sarah Chen',
+                date: 'May 08, 2026',
+                tags: ['AI', 'Productivity', 'DevTools'],
+                image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+                content: `<p class="mb-4">Artificial Intelligence tools have shifted from simple auto-completes to autonomous code refactoring systems. Let's analyze the current state of developer tooling.</p>`
+            }
+        ];
+
+        window.currentUser = null;
+        window.authIsSignUp = false;
+        let activeCategory = 'all';
+
+        // Initialize state
+        window.onload = () => {
+            const savedPosts = localStorage.getItem('nn_posts');
+            if (savedPosts) posts = JSON.parse(savedPosts);
+
+            renderPosts();
+            updateSeoPreview();
+        };
+
+        // UI View Switcher
+        function showSection(sectionId) {
+            ['feed', 'reader', 'editor', 'seo-tool'].forEach(sec => {
+                document.getElementById(`sec-${sec}`).classList.add('hidden');
+            });
+            document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
+
+            const hero = document.getElementById('hero-banner');
+            if (sectionId === 'feed') {
+                hero.classList.remove('hidden');
+            } else {
+                hero.classList.add('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Auth Guards
+        function requireAuth(targetSection) {
+            if (!window.currentUser) {
+                openAuthModal();
+            } else {
+                showSection(targetSection);
+            }
+        }
+
+        window.updateAuthUI = function() {
+            const container = document.getElementById('auth-controls');
+            if (window.currentUser) {
+                container.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-semibold text-slate-300 hidden sm:inline"><i class="fa-solid fa-user text-brand-400 mr-1"></i> ${window.currentUser.name}</span>
+                        <button onclick="logout()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold border border-slate-700">Sign Out</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="openAuthModal(false)" class="px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white">Sign In</button>
+                    <button onclick="openAuthModal(true)" class="px-3.5 py-1.5 bg-brand-500 hover:bg-brand-600 text-slate-950 rounded-lg text-xs font-bold transition-all shadow-md shadow-brand-500/20">Sign Up</button>
+                `;
+            }
+        };
+
+        function openAuthModal(signUp = false) {
+            window.authIsSignUp = signUp;
+            const modal = document.getElementById('auth-modal');
+            const title = document.getElementById('auth-modal-title');
+            const nameField = document.getElementById('auth-name-field');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleText = document.getElementById('auth-toggle-text');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+
+            if (window.authIsSignUp) {
+                title.innerText = 'Create your Niche&Nests Account';
+                nameField.classList.remove('hidden');
+                submitBtn.innerText = 'Create Account';
+                toggleText.innerText = 'Already have an account?';
+                toggleBtn.innerText = 'Sign In';
+            } else {
+                title.innerText = 'Sign In to Niche&Nests';
+                nameField.classList.add('hidden');
+                submitBtn.innerText = 'Sign In';
+                toggleText.innerText = "Don't have an account?";
+                toggleBtn.innerText = 'Sign Up';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        window.closeAuthModal = function() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        function toggleAuthMode() {
+            openAuthModal(!window.authIsSignUp);
+        }
+
+        // Render Posts Feed
+        function filterCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.innerText.toLowerCase() === cat.toLowerCase() || (cat === 'all' && btn.innerText === 'All')) {
+                    btn.className = 'cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-slate-950';
+                } else {
+                    btn.className = 'cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300';
+                }
+            });
+            renderPosts();
+        }
+
+        function renderPosts() {
+            const query = document.getElementById('feed-search').value.toLowerCase();
+            const container = document.getElementById('posts-container');
+
+            const filtered = posts.filter(p => {
+                const matchesCat = activeCategory === 'all' || p.category.toLowerCase() === activeCategory.toLowerCase();
+                const matchesSearch = p.title.toLowerCase().includes(query) || p.tags.some(t => t.toLowerCase().includes(query));
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-mono">No articles found matching your query.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(p => `
+                <article onclick="openArticle('${p.id}')" class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 group flex flex-col justify-between">
+                    <div>
+                        <div class="h-48 overflow-hidden relative">
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md border border-slate-700 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase text-brand-400">${p.category}</span>
+                        </div>
+                        <div class="p-5 space-y-3">
+                            <h3 class="font-bold text-lg text-white group-hover:text-brand-400 transition-colors line-clamp-2">${p.title}</h3>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${p.tags.map(t => `<span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">#${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5 pt-2 border-t border-slate-800/50 flex items-center justify-between text-xs text-slate-400">
+                        <span><i class="fa-solid fa-user text-slate-600 mr-1"></i> ${p.author}</span>
+                        <span>${p.date}</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Open Reader
+        function openArticle(id) {
+            const post = posts.find(p => p.id === id);
+            if (!post) return;
+
+            const view = document.getElementById('article-view');
+            view.innerHTML = `
+                <div class="space-y-4 border-b border-slate-800 pb-6">
+                    <span class="px-3 py-1 bg-brand-500/10 border border-brand-500/20 text-brand-400 rounded-md text-xs font-bold uppercase tracking-wider">${post.category}</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">${post.title}</h1>
+                    <div class="flex items-center space-x-4 text-xs text-slate-400">
+                        <span><i class="fa-solid fa-user text-brand-400 mr-1"></i> ${post.author}</span>
+                        <span>&bull;</span>
+                        <span>${post.date}</span>
+                    </div>
+                </div>
+
+                <div class="rounded-xl overflow-hidden max-h-96">
+                    <img src="${post.image}" class="w-full h-full object-cover">
+                </div>
+
+                <div class="prose prose-invert max-w-none text-slate-300 space-y-4 leading-relaxed font-sans">
+                    ${post.content}
+                </div>
+
+                <div class="pt-6 border-t border-slate-800 flex flex-wrap gap-2">
+                    ${post.tags.map(t => `<span class="text-xs bg-slate-800 text-brand-400 border border-slate-700 px-3 py-1 rounded-lg font-mono">#${t}</span>`).join('')}
+                </div>
+            `;
+
+            showSection('reader');
+        }
+
+        // Save Post
+        function savePost(e) {
+            e.preventDefault();
+            if (!window.currentUser) return openAuthModal();
+
+            const title = document.getElementById('post-title').value;
+            const category = document.getElementById('post-category').value;
+            const tags = document.getElementById('post-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+            const image = document.getElementById('post-image').value || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80';
+            const content = document.getElementById('post-content').value;
+
+            const newPost = {
+                id: Date.now().toString(),
+                title,
+                category,
+                author: window.currentUser.name,
+                date: 'Sep 27, 2026',
+                tags: tags.length ? tags : [category],
+                image,
+                content: `<p class="mb-4">${content.replace(/\n/g, '<br>')}</p>`
+            };
+
+            posts.unshift(newPost);
+            localStorage.setItem('nn_posts', JSON.stringify(posts));
+
+            document.getElementById('editor-form').reset();
+            renderPosts();
+            openArticle(newPost.id);
+        }
+
+        // SEO Tool Live Preview Logic
+        function updateSeoPreview() {
+            const title = document.getElementById('seo-input-title').value || 'Untitled Article | Niche&Nests';
+            const slug = document.getElementById('seo-input-slug').value || 'article';
+            const desc = document.getElementById('seo-input-desc').value || 'Article description...';
+
+            document.getElementById('seo-preview-title').innerText = title;
+            document.getElementById('seo-preview-url').innerText = `https://nicheandnests.com › ${slug}`;
+            document.getElementById('seo-preview-desc').innerText = desc;
+
+            // Health Checks
+            const titleStatus = document.getElementById('seo-title-status');
+            if (title.length >= 30 && title.length <= 60) {
+                titleStatus.innerText = `Optimal (${title.length} chars)`;
+                titleStatus.className = 'text-emerald-400';
+            } else {
+                titleStatus.innerText = `Warning (${title.length} chars - recommended 30-60)`;
+                titleStatus.className = 'text-amber-400';
+            }
+
+            const descStatus = document.getElementById('seo-desc-status');
+            if (desc.length >= 120 && desc.length <= 160) {
+                descStatus.innerText = `Optimal (${desc.length} chars)`;
+                descStatus.className = 'text-emerald-400';
+            } else {
+                descStatus.innerText = `Warning (${desc.length} chars - recommended 120-160)`;
+                descStatus.className = 'text-amber-400';
+            }
+        }
+    </script>
+</body>
+</html>
